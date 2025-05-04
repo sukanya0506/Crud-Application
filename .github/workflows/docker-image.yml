@@ -1,0 +1,32 @@
+name: Docker Build and Test
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Build Docker images
+      run: docker-compose build
+      
+    - name: Run Docker containers
+      run: docker-compose up -d
+      
+    - name: Wait for containers to start
+      run: sleep 10
+      
+    - name: Check running containers
+      run: docker-compose ps
+      
+    - name: Backend health check
+      run: curl -f http://localhost:5000/health || exit 1
+      
+    - name: Stop containers
+      run: docker-compose down
